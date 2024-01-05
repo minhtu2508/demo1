@@ -1,0 +1,79 @@
+import pygame
+import sys
+import random
+
+# Khởi tạo Pygame
+pygame.init()
+
+# Kích thước màn hình
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
+
+# Màu sắc
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# Khởi tạo màn hình
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Trò Chơi Xếp Hình")
+
+# Định nghĩa các khối hình cơ bản
+blocks = [
+    [[1, 1, 1],
+     [0, 1, 0]],
+
+    [[1, 1],
+     [1, 1]],
+
+    [[1, 1, 1, 1]],
+
+    [[1, 1, 1],
+     [1, 0, 0]],
+]
+
+# Chọn một khối hình ngẫu nhiên
+current_block = random.choice(blocks)
+block_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+# Tọa độ của khối hình hiện tại trên màn hình
+block_x = SCREEN_WIDTH // 2 - len(current_block[0]) * 30 // 2
+block_y = 0
+
+# Tốc độ rơi tự do của khối hình
+fall_speed = 1
+
+clock = pygame.time.Clock()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and block_x > 0:
+        block_x -= 30
+    if keys[pygame.K_RIGHT] and block_x < SCREEN_WIDTH - len(current_block[0]) * 30:
+        block_x += 30
+
+    # Di chuyển khối hình xuống
+    block_y += fall_speed
+
+    # Kiểm tra xem khối hình đã chạm đáy chưa
+    if block_y + len(current_block) * 30 > SCREEN_HEIGHT:
+        block_y = 0
+        block_x = SCREEN_WIDTH // 2 - len(current_block[0]) * 30 // 2
+        current_block = random.choice(blocks)
+        block_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+    # Vẽ màn hình
+    screen.fill(WHITE)
+
+    # Vẽ khối hình hiện tại
+    for i in range(len(current_block)):
+        for j in range(len(current_block[0])):
+            if current_block[i][j] == 1:
+                pygame.draw.rect(screen, block_color, (block_x + j * 30, block_y + i * 30, 30, 30))
+
+    pygame.display.flip()
+    clock.tick(30)
